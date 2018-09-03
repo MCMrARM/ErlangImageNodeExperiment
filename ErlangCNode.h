@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string>
-#include "ei.h"
+#include <ei.h>
 
 class ErlangCNode {
 
@@ -23,9 +23,11 @@ public:
 
     ~ErlangCNode();
 
-    void createServerSocket();
+    void createServerSocket(int maxBacklog = 5);
 
     void closeServerSocket();
+
+    int accept(ErlConnect& connection);
 
     void publish();
 

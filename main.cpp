@@ -1,14 +1,11 @@
-#include <iostream>
-
-#include "erl_interface.h"
-#include "ErlangCNode.h"
+#include <erl_interface.h>
+#include "Application.h"
 
 int main() {
     erl_init(nullptr, 0);
 
-    ErlangCNode node ("imagep@node");
-    node.createServerSocket();
-    node.publish();
+    Application app ("imagep");
+    app.run();
 
     return 0;
 }

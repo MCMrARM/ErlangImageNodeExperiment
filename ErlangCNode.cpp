@@ -25,22 +25,22 @@ ErlangCNode::~ErlangCNode() {
     closeServerSocket();
 }
 
-void ErlangCNode::createServerSocket() {
+void ErlangCNode::createServerSocket(int maxBacklog) {
     serverSocket = socket(AF_INET, SOCK_STREAM, 0);
-    struct sockaddr_in addr;
+    sockaddr_in addr;
     memset(&addr, 0, sizeof(addr));
     addr.sin_family = AF_INET;
     addr.sin_addr.s_addr = INADDR_ANY;
     addr.sin_port = 0; // Any
     if (bind(serverSocket, (sockaddr*) &addr, sizeof(addr)) < 0)
         throw std::runtime_error("Failed to bind to the specified port");
-    if (listen(serverSocket, 5) < 0)
+    if (listen(serverSocket, maxBacklog) < 0)
         throw std::runtime_error("Failed to start listening");
     socklen_t addr_len = sizeof(addr);
     getsockname(serverSocket, (sockaddr*) &addr, &addr_len);
     if (addr.sin_family != AF_INET)
         throw std::runtime_error("getsockname() returned a different family that AF_INET");
-    serverSocketPort = addr.sin_port;
+    serverSocketPort = ntohs(addr.sin_port);
     Log::info(TAG, "Server created on port: %i", serverSocketPort);
 }
 
@@ -55,9 +55,15 @@ void ErlangCNode::closeServerSocket() {
     }
 }
 
+int ErlangCNode::accept(ErlConnect& connection) {
+    if (serverSocket == -1)
+        throw std::runtime_error("createServerSocket() not called");
+    return ei_accept(&ec, serverSocket, &connection);
+}
+
 void ErlangCNode::publish() {
     if (serverSocketPort == -1)
-        createServerSocket();
+        throw std::runtime_error("createServerSocket() not called");
     publishFd = ei_publish(&ec, serverSocketPort);
     if (publishFd < 0)
         throw std::runtime_error("Failed to publish the node");
@@ -75,7 +81,7 @@ std::string ErlangCNode::readSystemCookie() {
     std::ifstream file (std::string(home) + "/.erlang.cookie");
     if (!file)
         return std::string();
-    std::stringstream ss;
-    ss << file.rdbuf();
-    return ss.str();
+    std::string cookie;
+    file >> cookie;
+    return cookie;
 }

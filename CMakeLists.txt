@@ -6,6 +6,7 @@ set(CMAKE_CXX_STANDARD 11)
 
 find_package(Erlang REQUIRED)
 
-add_executable(ImageNode main.cpp ErlangCNode.cpp ErlangCNode.h Log.h Log.cpp)
+add_executable(ImageNode main.cpp ErlangCNode.cpp ErlangCNode.h Log.h Log.cpp Application.cpp Application.h ErlangBufferReadHelper.h)
 target_include_directories(ImageNode PUBLIC ${ERLANG_INCLUDE_DIRS})
 target_link_libraries(ImageNode PUBLIC ${ERLANG_LIBRARIES})
+target_compile_definitions(ImageNode PUBLIC ${ERLANG_COMPILE_DEFS})
