@@ -47,6 +47,13 @@ public:
     _DecodeStringFunc(decodeString, ei_decode_string)
     _DecodeStringFunc(decodeAtom, ei_decode_atom)
 
+    _DecodeFunc(decodeTupleHeader, ei_decode_tuple_header, int)
+
 #undef _DecodeFunc
+
+    void decodeAtom(char* buf) {
+        if (ei_decode_atom(data, &index, buf) < 0)
+            throw std::runtime_error("Failed to read the atom");
+    }
 
 };

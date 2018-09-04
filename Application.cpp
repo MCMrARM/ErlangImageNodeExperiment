@@ -43,10 +43,20 @@ void Application::handleConnection(int fd, ErlConnect connect) {
         if (r == ERL_TICK || msg.msgtype != ERL_REG_SEND)
             continue;
         ErlangBufferReadHelper reader (buf.buff);
-        reader.decodeVersion();
-        Log::trace(TAG, "Test: %c", reader.getType());
-
+        handleMessage(reader);
     }
     ei_x_free(&buf);
     close(fd);
+}
+
+void Application::handleMessage(ErlangBufferReadHelper& reader) {
+    reader.decodeVersion();
+    int count = reader.decodeTupleHeader();
+
+    char atom[MAXATOMLEN];
+    reader.decodeAtom(atom);
+    Log::trace(TAG, "Received message: %s [%i args]", atom, count);
+    if (strcmp(atom, "process_image") == 0) {
+        Log::trace(TAG, "Starting process_image");
+    }
 }
