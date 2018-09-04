@@ -8,7 +8,7 @@
 find_package(PkgConfig)
 pkg_check_modules(PC_VIPS QUIET vips)
 
-find_package(GLIB REQUIRED)
+find_package(GLIB REQUIRED COMPONENTS gobject)
 
 find_path(VIPS_INCLUDE_DIR
         NAMES vips/vips8
@@ -24,5 +24,5 @@ find_package_handle_standard_args(Vips DEFAULT_MSG
 
 mark_as_advanced(VIPS_INCLUDE_DIR VIPS_LIBRARY)
 
-set(VIPS_LIBRARIES ${VIPS_LIBRARY} ${GLIB_LIBRARIES})
+set(VIPS_LIBRARIES ${VIPS_LIBRARY} ${GLIB_LIBRARIES} ${GLIB_GOBJECT_LIBRARIES})
 set(VIPS_INCLUDE_DIRS ${VIPS_INCLUDE_DIR} ${GLIB_INCLUDE_DIRS})

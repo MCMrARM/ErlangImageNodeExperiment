@@ -4,7 +4,7 @@
 #include <thread>
 #include <unistd.h>
 #include <cstring>
-#include <vips/vips8>
+#include <vips/vips.h>
 #include "Log.h"
 #include "ErlangBufferReadHelper.h"
 
@@ -58,5 +58,27 @@ void Application::handleMessage(ErlangBufferReadHelper& reader) {
     Log::trace(TAG, "Received message: %s [%i args]", atom, count);
     if (strcmp(atom, "process_image") == 0) {
         Log::trace(TAG, "Starting process_image");
+        std::string inputPath = reader.decodeBinary();
+        std::string outputPath = reader.decodeBinary();
+        int width = (int) reader.decodeLong();
+        int height = (int) reader.decodeLong();
+        handleProcessImage(inputPath, outputPath, width, height);
     }
+}
+
+void Application::handleProcessImage(std::string const& inputPath, std::string const& outputPath,
+                                     int width, int height) {
+    VipsImage* image;
+    if (vips_thumbnail(inputPath.c_str(), &image, width,
+                       "height", height,
+                       "crop", VIPS_INTERESTING_CENTRE, nullptr)) {
+        Log::warn(TAG, "Failed to open image: %s", inputPath.c_str());
+        return;
+    }
+    vips_image_remove(image, VIPS_META_ICC_NAME);
+    if (vips_webpsave(image, outputPath.c_str(), nullptr) < 0) {
+        Log::warn(TAG, "Failed to save image");
+    }
+    g_object_unref(image);
+    Log::info(TAG, "Saved image");
 }

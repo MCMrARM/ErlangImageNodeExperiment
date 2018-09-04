@@ -51,6 +51,17 @@ public:
 
 #undef _DecodeFunc
 
+    std::string decodeBinary() {
+        int type, size;
+        if (ei_get_type(data, &index, &type, &size) < 0)
+            throw std::runtime_error("Failed to get the binary length");
+        std::string ret;
+        ret.resize(size);
+        long len;
+        if (ei_decode_binary(data, &index, &ret[0], &len) < 0)
+            throw std::runtime_error("Failed to read the specified binary");
+        return ret;
+    }
     void decodeAtom(char* buf) {
         if (ei_decode_atom(data, &index, buf) < 0)
             throw std::runtime_error("Failed to read the atom");
