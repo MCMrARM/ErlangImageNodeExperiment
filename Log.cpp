@@ -13,5 +13,5 @@ void Log::vlog(LogLevel level, const char* tag, const char* text, va_list args) 
     tm tm;
     localtime_r(&t, &tm);
     strftime(tbuf, sizeof(tbuf), "%H:%M:%S", &tm);
-    printf("%s %s [%s] %s\n", tbuf, getLogLevelString(level), tag, buffer);
+    printf("%s %-5s [%s] %s\n", tbuf, getLogLevelString(level), tag, buffer);
 }
