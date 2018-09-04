@@ -4,6 +4,7 @@
 #include <thread>
 #include <unistd.h>
 #include <cstring>
+#include <vips/vips8>
 #include "Log.h"
 #include "ErlangBufferReadHelper.h"
 
